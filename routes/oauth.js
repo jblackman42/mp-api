@@ -23,7 +23,7 @@ router.post('/login', async (req, res) => {
         }),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ZXZlbnQtcGxhbm5lcjppOHBGQ2pZSDJ3MTI3UmgzQyVaVEptYSRzXlhrYkBSVw=='
+            'Authorization': 'Basic ' = process.env.BASIC-AUTH-SECRET
         }
     })
         .then(response => {

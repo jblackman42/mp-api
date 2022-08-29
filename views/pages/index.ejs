@@ -7,43 +7,77 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="loggedIn" style="visibility: hidden; display: none;"></div>
+    <div id="loggedIn" style="visibility: hidden; display: none;">
+        <p id="userWelcomeMsg"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
     <div id="loggedOut">
         <a href="/login" id="loginBtn">Login</a>
     </div>
     <h1>Hello World</h1>
+    <button onclick="getEvents()">Get Events</button>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     const loggedIn = document.getElementById('loggedIn')
     const loggedOut = document.getElementById('loggedOut')
 
+    const userWelcomeMsg = document.getElementById('userWelcomeMsg')
+
     const user_id = getCookie('user_id');
     const access_token = getCookie('access_token');
 
-    axios({
-        method: 'get',
-        url: `https://my.pureheart.org/ministryplatformapi/users/${user_id}`,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${access_token}`
-        }
-    })
-        .then(response => response.data)
-        .then(data => {
-            console.log(data)
-            const name = data.DisplayName.split(', ').reverse().join(' ')
-
-            loggedOut.style.visibility = 'hidden';
-            loggedOut.style.display = 'none';
-
-            loggedIn.innerHTML += `<p>Welcome, ${name}</p>`;
-            loggedIn.style.visibility = 'visible';
-            loggedIn.style.display = 'block';
+    if (user_id && access_token) {
+        axios({
+            method: 'get',
+            url: `https://my.pureheart.org/ministryplatformapi/users/${user_id}`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${access_token}`
+            }
         })
-        .catch(err => {
-            console.error(err)
+            .then(response => response.data)
+            .then(data => {
+                console.log(data)
+                const name = data.DisplayName.split(', ').reverse().join(' ')
+
+                loggedOut.style.visibility = 'hidden';
+                loggedOut.style.display = 'none';
+
+                userWelcomeMsg.innerHTML = `Welcome, ${name}`;
+                loggedIn.style.visibility = 'visible';
+                loggedIn.style.display = 'block';
+            })
+            .catch(err => {
+                console.error(err)
+            })
+    }
+
+    function getEvents() {
+        axios({
+            method: 'get',
+            url: `https://my.pureheart.org/ministryplatformapi/tables/events?%24orderby=Event_Start_Date%20DESC%20`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${access_token}`
+            }
         })
+            .then(response => response.data)
+            .then(data => {
+                console.log(data)
+            })
+            .catch(err => {
+                console.error(err)
+            })
+    }
+
+    function logout() {
+        //remove all cookies
+        document.cookie = "user_id= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "access_token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
+
+        window.location = '/'
+    }
 
     function getCookie(cname) {
         let name = cname + "=";

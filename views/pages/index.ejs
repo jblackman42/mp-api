@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="loggedIn" style="visibility: hidden; display: none;"></div>
+    <div id="loggedOut">
+        <a href="/login" id="loginBtn">Login</a>
+    </div>
+    <h1>Hello World</h1>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    const loggedIn = document.getElementById('loggedIn')
+    const loggedOut = document.getElementById('loggedOut')
+
+    const user_id = getCookie('user_id');
+    const access_token = getCookie('access_token');
+
+    axios({
+        method: 'get',
+        url: `https://my.pureheart.org/ministryplatformapi/users/${user_id}`,
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${access_token}`
+        }
+    })
+        .then(response => response.data)
+        .then(data => {
+            console.log(data)
+            const name = data.DisplayName.split(', ').reverse().join(' ')
+
+            loggedOut.style.visibility = 'hidden';
+            loggedOut.style.display = 'none';
+
+            loggedIn.innerHTML += `<p>Welcome, ${name}</p>`;
+            loggedIn.style.visibility = 'visible';
+            loggedIn.style.display = 'block';
+        })
+        .catch(err => {
+            console.error(err)
+        })
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+</script>
+</html>
